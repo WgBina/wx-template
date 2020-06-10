@@ -2,17 +2,18 @@ import api from '../lib/api'
 const openId_name = 'xiao_openId'
 const sessionKey_name = 'xiao_sessionKey'
 
-
 /**
  * 微信静默登录
  */
 async function wxLogin() {
     return new Promise((resolve, reject) => {
         wx.login({
-            success(res) {
+            async success(res) {
                 //默认调用微信登录后就调用后台登录
-                const { success, resCode, data } = await api.login({jsCode:res.code})
-                if (success) {
+                const { success, resCode, data } = await api.login({
+                    jsCode: res.code,
+                })
+                if (success || resCode == -2) {
                     wx.setStorageSync(openId_name, data.openId)
                     wx.setStorageSync(sessionKey_name, data.sessionKey)
                 }
@@ -34,13 +35,12 @@ async function wxLogin() {
  * 后台有条件注册
  */
 async function register(addUserParams) {
-    let query = formatParams(addUserParams)
+    let query = await formatParams(addUserParams)
+
     console.log(query)
     return
     api.register(query)
-
 }
-
 
 async function getUserInfo() {
     return new Promise((resolve, reject) => {
@@ -65,37 +65,6 @@ async function getUserInfo() {
  * addUser
  * @param {--userId--userLevel}
  */
-async function register(loginParams = {}, addUserParams, loginType = '') {
-    wxLogin().then((res) => {
-        console.log(res)
-        let query = {
-            jsCode: res,
-            ...loginParams,
-        }
-        api.login(query).then((res) => {
-            console.log(res)
-            const { openId } = res.data
-            const { sessionKey } = res.data
-            wx.setStorageSync('xiao_openId', openId)
-            wx.setStorageSync('xiao_sessionKey', sessionKey)
-
-            //已授权解锁以下板块
-            if (!addUserParams) return
-
-            let query = formatParams(addUserParams)
-            if (query) {
-                query.openId = openId
-                query.sessionKey = sessionKey
-            }
-            console.log('注册参数:', query)
-            //code == -2, 用户不存在，进行注册
-            if (res.code == -2) {
-                //注册用户
-                // api.addUser(query)
-            }
-        })
-    })
-}
 
 async function formatParams(params) {
     if (!params) return params
@@ -113,8 +82,8 @@ async function formatParams(params) {
     const { province } = params.userInfo
     const wechatName = params.userInfo.nickName
 
-    const openId =    wx.getStorageSync(openId_name)
-    const sessionKey =  wx.getStorageSync(sessionKey_name)
+    const openId = wx.getStorageSync(openId_name)
+    const sessionKey = wx.getStorageSync(sessionKey_name)
 
     return {
         encryptedData,
@@ -130,7 +99,7 @@ async function formatParams(params) {
         province,
         wechatName,
         openId,
-        sessionKey
+        sessionKey,
     }
 }
 
