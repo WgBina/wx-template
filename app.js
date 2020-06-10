@@ -1,5 +1,5 @@
 //app.js
-import { register } from './utils/auth'
+import { register,wxLogin } from './utils/auth'
 
 App({
   onLaunch: function () {
@@ -9,8 +9,8 @@ App({
     wx.setStorageSync('logs', logs)
 
     this.getUserInfo()
-
-    register()
+    wxLogin()
+    // register()
   },
 
 
