@@ -32,7 +32,7 @@ async function wxLogin() {
 }
 
 /**
- * 后台有条件注册
+ * 存在用户信息(addUserParams)进行注册
  */
 async function register(addUserParams) {
     let query = await formatParams(addUserParams)
@@ -56,15 +56,7 @@ async function getUserInfo() {
     })
 }
 
-/**
- *
- * login
- * @param {jsCode}
- *
- * 存在用户信息(addUserParams) && login的code返回-2才进行注册
- * addUser
- * @param {--userId--userLevel}
- */
+
 
 async function formatParams(params) {
     if (!params) return params

@@ -27,7 +27,6 @@ App({
                             this.globalData.userInfo = res.userInfo
 
                             wxLogin().then((code) => {
-                                console.log(code)
                                 if (code == -2) register(res)
                             })
 
